@@ -1,0 +1,40 @@
+<form method="post">
+    {% csrf_token %}
+    <input type="text" name="city" id="city" placeholder="Введите город">
+    <input type="submit" value="Получить прогноз">
+</form>
+
+{% if last_search %}
+<p>Ваш последний поиск: <a href="{% url 'get_weather' %}?city={{ last_search.city }}">{{ last_search.city }}</a></p>
+{% endif %}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/smoothness/jquery-ui.css">
+
+<script>
+    $(function () {
+        $("#city").autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: "https://nominatim.openstreetmap.org/search",
+                    dataType: "json",
+                    data: {
+                        q: request.term,
+                        format: "json",
+                        limit: 5
+                    },
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            return {
+                                label: item.display_name,
+                                value: item.display_name
+                            }
+                        }));
+                    }
+                });
+            },
+            minLength: 2
+        });
+    });
+</script>
