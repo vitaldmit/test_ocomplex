@@ -1,0 +1,134 @@
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+.container {
+    width: 80%;
+    max-width: 1200px;
+    margin: 20px;
+    padding: 20px;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+}
+
+h1,
+h2,
+h3 {
+    color: #333;
+    text-align: center;
+}
+
+form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+input[type="text"],
+select,
+button {
+    padding: 10px;
+    margin: 0 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+th,
+td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.error {
+    color: red;
+    text-align: center;
+}
+
+.search-history {
+    margin-top: 20px;
+}
+
+.search-history h3 {
+    text-align: center;
+}
+
+.search-history ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.search-history li {
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+#weatherChart {
+    margin-top: 20px;
+    width: 100%;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#chartType {
+    display: block;
+    margin: 20px auto;
+}
+
+.home-link {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.home-link a {
+    text-decoration: none;
+    color: #4CAF50;
+}
+
+.home-link a:hover {
+    text-decoration: underline;
+}
+
+p.last_search {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+/* .ui-autocomplete {
+    max-height: 200px;
+    overflow-y: auto;
+    overflow-x: hidden;
+} */

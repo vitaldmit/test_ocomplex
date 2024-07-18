@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% load weather_extras %}
+
+{% block content %}
+<h1>Детальный прогноз погоды для {{ city }}</h1>
+<table>
+    <tr>
+        <th>Дата</th>
+        <th>Погода</th>
+        <th>Макс. температура</th>
+        <th>Мин. температура</th>
+        <th>Осадки</th>
+    </tr>
+    {% for date, max_temp, min_temp, precip, weathercode in weather_data.daily.zipped_data %}
+    <tr>
+        <td>{{ date }}</td>
+        <td>{{ weathercode|weather_icon }}</td>
+        <td>{{ max_temp }}°{{ weather_data.units }}</td>
+        <td>{{ min_temp }}°{{ weather_data.units }}</td>
+        <td>{{ precip }} мм</td>
+    </tr>
+    {% endfor %}
+</table>
+<a href="{% url 'home' %}">Назад к поиску</a>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load weather_extras %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <div class="home-link">
+        <a href="{% url 'home' %}">Главная</a>
+    </div>
+
+    <h1>Прогноз погоды</h1>
+
+    {% if last_search %}
+        <p class="last_search">Ваш последний поиск: <a href="?city={{ last_search.city }}">{{ last_search.city }}</a></p>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        <input type="text" name="city" id="city-input" placeholder="Введите название города">
+        <select name="units">
+            <option value="C" {% if units == 'C' %}selected{% endif %}>°C</option>
+            <option value="F" {% if units == 'F' %}selected{% endif %}>°F</option>
+        </select>
+        <button type="submit">Поиск</button>
+    </form>
+
+    {% if error_message %}
+        <p style="color: red;">{{ error_message }}</p>
+    {% endif %}
+
+    {% if weather_data %}
+        <h2>Прогноз погоды на 7 дней:</h2>
+        <table>
+            <tr>
+                <th>Дата</th>
+                <th>Погода</th>
+                <th>Макс. температура</th>
+                <th>Мин. температура</th>
+                <th>Осадки</th>
+            </tr>
+            {% for date, max_temp, min_temp, precip, weathercode in weather_data.daily.zipped_data %}
+            <tr>
+                <td>{{ date }}</td>
+                <td>{{ weathercode|weather_icon }}</td>
+                <td>{{ max_temp }}°{% if weather_data.units == 'C' %}C{% else %}F{% endif %}</td>
+                <td>{{ min_temp }}°{% if weather_data.units == 'C' %}C{% else %}F{% endif %}</td>
+                <td>{{ precip }} мм</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <div style="width:80%; margin:auto;">
+            <select id="chartType">
+                <option value="temperature">Температура</option>
+                <option value="precipitation">Осадки</option>
+            </select>
+            <canvas id="weatherChart"></canvas>
+        </div>
+    {% endif %}
+
+    {% if search_history %}
+        <div class="search-history">
+        <h3>История поисков:</h3>
+        <ul>
+            {% for search in search_history %}
+            <li><a href="?city={{ search.city|urlencode }}">{{ search.city }}</a> - {{ search.search_date|date:"d.m.Y H:i" }} ({{ search.units }})</li>
+            {% endfor %}
+        </ul>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

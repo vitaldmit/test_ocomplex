@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Прогноз погоды</title>
+    {% load static %}
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'weather/css/style.css' %}">
+    
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    
+    {% block content %}{% endblock %}
+
+    <script>
+        $(function () {
+            var timer;
+            $("#city-input").autocomplete({
+                source: function (request, response) {
+                    clearTimeout(timer);
+                    timer = setTimeout(function () {
+                        $.ajax({
+                            url: "{% url 'city_autocomplete' %}",
+                            data: { term: request.term },
+                            dataType: "json",
+                            success: function (data) {
+                                response(data);
+                            },
+                            error: function () {
+                                response([]);
+                            }
+                        });
+                    }, 300);  // 300 мс задержка
+                },
+                minLength: 2
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            {% if weather_data_json %}
+            var weatherData = JSON.parse('{{ weather_data_json|safe }}');
+            var dates = weatherData.daily.time;
+            var maxTemps = weatherData.daily.temperature_2m_max;
+            var minTemps = weatherData.daily.temperature_2m_min;
+            var precipitation = weatherData.daily.precipitation_sum;
+
+            var ctx = document.getElementById('weatherChart').getContext('2d');
+            var chart;
+
+            function createTemperatureChart() {
+                return new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: dates,
+                        datasets: [{
+                            label: 'Макс. температура',
+                            data: maxTemps,
+                            borderColor: 'rgb(255, 99, 132)',
+                            tension: 0.1
+                        }, {
+                            label: 'Мин. температура',
+                            data: minTemps,
+                            borderColor: 'rgb(54, 162, 235)',
+                            tension: 0.1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                title: {
+                                    display: true,
+                                    text: 'Температура (°C)'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            function createPrecipitationChart() {
+                return new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: dates,
+                        datasets: [{
+                            label: 'Осадки',
+                            data: precipitation,
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderColor: 'rgb(75, 192, 192)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Осадки (мм)'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            function updateChart() {
+                if (chart) {
+                    chart.destroy();
+                }
+                var chartType = document.getElementById('chartType').value;
+                if (chartType === 'temperature') {
+                    chart = createTemperatureChart();
+                } else {
+                    chart = createPrecipitationChart();
+                }
+            }
+
+            document.getElementById('chartType').addEventListener('change', updateChart);
+            updateChart();
+            {% endif %}
+        });
+    </script>
+
+</body>
+</html>
