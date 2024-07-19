@@ -21,6 +21,18 @@ logger = logging.getLogger(__name__)
 
 
 def home(request):
+    """
+    Отображает домашнюю страницу приложения погоды, обрабатывает вводимые пользователем данные и отображает данные о погоде.
+
+    Функция `home` отвечает за следующее:
+    - Проверка наличия у пользователя активной сессии и создание новой, если нет.
+    - Получение предпочтительных единиц измерения температуры пользователя из сеанса.
+    - Обработка пользовательского ввода города для поиска либо из отправки формы, либо из параметра GET.
+    - Выполнение поиска по геокодированию для определения широты и долготы запрошенного города.
+    - Вызов функции `get_weather` для получения данных о погоде для заданных координат.
+    - Обновление истории поиска в базе данных.
+    - Отображение шаблона `home.html` с полученными данными о погоде, историей поиска и любыми сообщениями об ошибках.
+    """
     weather_data = None
     error_message = None
 
@@ -95,7 +107,7 @@ def home(request):
 
     # Получаем историю поисков и последний поиск после обновления
     search_history = SearchHistory.objects.filter(session_key=session_key)[:5]
-    last_search = search_history.first()  # Теперь это действительно последний поиск
+    last_search = search_history.first()
 
     context = {
         'weather_data': weather_data,
@@ -110,6 +122,17 @@ def home(request):
 
 
 def get_weather(latitude, longitude, units='C'):
+    """
+    Извлекает прогноз погоды для заданных координат широты и долготы и возвращает данные в виде словаря.
+
+    Args:
+        latitude (float): координата широты.
+        longitude (float): координата долготы.
+        units (str, optional): единицы измерения температуры: «C» для Цельсия или «F» для Фаренгейта. По умолчанию «С».
+
+    Returns:
+        dict: словарь, содержащий данные прогноза погоды, или «Нет», если возникает ошибка.
+    """
     logger.info(f"Getting weather for coordinates: {latitude}, {longitude}, units: {units}")
     cache_key = hashlib.md5(f"{latitude}_{longitude}_{units}".encode()).hexdigest()
     cached_data = cache.get(cache_key)
@@ -145,6 +168,17 @@ def get_weather(latitude, longitude, units='C'):
 
 
 def city_autocomplete(request):
+    """
+    Предоставляет конечную точку API для автозаполнения названий городов с помощью службы геокодирования Nominatim.
+
+    Эта функция просмотра обрабатывает запросы к конечной точке `/city-autocomplete/`, которая принимает параметр запроса `term` для поиска названий городов. Он отправляет запрос к Nominatim API, получает 5 наиболее подходящих названий городов и возвращает их в виде ответа JSON.
+
+    Args:
+        request (django.http.request.HttpRequest): входящий HTTP-запрос.
+
+    Returns:
+        django.http.response.JsonResponse: ответ JSON, содержащий список автоматически заполненных названий городов.
+    """
     term = request.GET.get('term', '')
     url = f"https://nominatim.openstreetmap.org/search?format=json&q={term}"
     headers = {
@@ -166,6 +200,11 @@ def city_autocomplete(request):
 
 
 class CitySearchCountView(APIView):
+    """
+    Предоставляет конечную точку API для получения наиболее частого количества поисков по городам из модели `SearchHistory`.
+    Класс `CitySearchCountView` — это представление API, которое возвращает список самых популярных городов при поиске, упорядоченных по количеству в порядке убывания.
+    Данные ответа сериализуются с помощью `CitySearchCountSerializer` и возвращаются в виде ответа JSON.
+    """
     def get(self, request):
         city_counts = SearchHistory.objects.values('city').annotate(count=Count('city')).order_by('-count')
         serializer = CitySearchCountSerializer(city_counts, many=True)
