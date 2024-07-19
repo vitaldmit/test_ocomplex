@@ -1,17 +1,21 @@
-from django.shortcuts import render, redirect
-from django.utils import timezone
-import requests
-from django.shortcuts import render
-from .models import SearchHistory
-from django.template.defaulttags import register
-from django.core.cache import cache
-import os
-import urllib.parse
-from django.http import JsonResponse
-import logging
 import json
-from django.core.serializers.json import DjangoJSONEncoder
+import logging
 import hashlib
+import urllib.parse
+import requests
+
+from django.shortcuts import render
+from django.utils import timezone
+from django.core.cache import cache
+from django.http import JsonResponse
+from django.core.serializers.json import DjangoJSONEncoder
+from django.db.models import Count
+from rest_framework.views import APIView
+from rest_framework.response import Response
+
+from .models import SearchHistory
+from .serializers import CitySearchCountSerializer
+
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +23,7 @@ logger = logging.getLogger(__name__)
 def home(request):
     weather_data = None
     error_message = None
-    
+
     if not request.session.session_key:
         request.session.save()
     session_key = request.session.session_key
@@ -37,26 +41,26 @@ def home(request):
 
     if city:
         logger.info(f"Searching for city: {city}")
-        
+
         city_name = city.split(',')[0].strip()
-        
+
         encoded_city = urllib.parse.quote(city_name)
         geocoding_url = f"https://geocoding-api.open-meteo.com/v1/search?name={encoded_city}&count=5&language=ru&format=json"
-        
+
         try:
             geocoding_response = requests.get(geocoding_url, timeout=5)
             geocoding_response.raise_for_status()
             geocoding_data = geocoding_response.json()
-            
+
             logger.info(f"Geocoding API response: {geocoding_data}")
-            
+
             if geocoding_data.get('results'):
                 location = next((result for result in geocoding_data['results'] 
-                                 if result.get('country') == 'Russia'), 
+                                if result.get('country') == 'Russia'), 
                                 geocoding_data['results'][0])
-                
+
                 logger.info(f"Selected location: {location}")
-                
+
                 latitude = location['latitude']
                 longitude = location['longitude']
                 full_city_name = location['name']
@@ -64,11 +68,11 @@ def home(request):
                     full_city_name += f", {location['admin1']}"
                 if location.get('country'):
                     full_city_name += f", {location['country']}"
-                
+
                 logger.info(f"Fetching weather for: {full_city_name} ({latitude}, {longitude})")
-                
+
                 weather_data = get_weather(latitude, longitude, units)
-                
+
                 if weather_data:
                     logger.info("Weather data successfully retrieved")
                     SearchHistory.objects.update_or_create(
@@ -92,7 +96,7 @@ def home(request):
     # Получаем историю поисков и последний поиск после обновления
     search_history = SearchHistory.objects.filter(session_key=session_key)[:5]
     last_search = search_history.first()  # Теперь это действительно последний поиск
-    
+
     context = {
         'weather_data': weather_data,
         'last_search': last_search,
@@ -103,6 +107,7 @@ def home(request):
     if weather_data:
         context['weather_data_json'] = json.dumps(weather_data, cls=DjangoJSONEncoder)
     return render(request, 'weather/home.html', context)
+
 
 def get_weather(latitude, longitude, units='C'):
     logger.info(f"Getting weather for coordinates: {latitude}, {longitude}, units: {units}")
@@ -117,7 +122,7 @@ def get_weather(latitude, longitude, units='C'):
         response = requests.get(url, timeout=5)
         response.raise_for_status()
         data = response.json()
-        
+
         zipped_data = zip(
             data['daily']['time'],
             data['daily']['temperature_2m_max'],
@@ -127,9 +132,9 @@ def get_weather(latitude, longitude, units='C'):
         )
         data['daily']['zipped_data'] = list(zipped_data)
         data['units'] = units
-        
+
         cache.set(cache_key, data, timeout=1800)  # 30 минут
-        
+
         return data
     except requests.RequestException as e:
         logger.error(f"Error fetching weather data: {e}")
@@ -158,3 +163,10 @@ def city_autocomplete(request):
         logger.error(f"Error parsing JSON from Nominatim: {e}")
         results = []
     return JsonResponse(results, safe=False)
+
+
+class CitySearchCountView(APIView):
+    def get(self, request):
+        city_counts = SearchHistory.objects.values('city').annotate(count=Count('city')).order_by('-count')
+        serializer = CitySearchCountSerializer(city_counts, many=True)
+        return Response(serializer.data)

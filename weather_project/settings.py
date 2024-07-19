@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +24,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-%@7gygel&b1f4d9xbczak91*l-qecdk($-!v99%8ug7ge57l=c'
+SECRET_KEY = os.getenv('SECRET_KEY')
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost',]
 
 
 # Application definition
@@ -37,7 +42,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'apps.weather'
+    'apps.weather',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [
@@ -71,17 +77,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'weather_project.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
-
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
@@ -106,7 +101,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'ru-RU'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Moscow'
 
 USE_I18N = True
 
@@ -134,8 +129,25 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
 
+# URL that handles the media served from MEDIA_ROOT. Make sure to use a
+# trailing slash.
+# Examples: "http://example.com/media/", "http://media.example.com/"
+
+MEDIA_URL = '/media/'
+
+# Absolute filesystem path to the directory that will hold user-uploaded files.
+# Example: "/var/www/example.com/media/"
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Этот код настраивает систему журналирования Django для регистрации ошибок в файле с именем «debug.log». Параметр «версия» указывает версию конфигурации ведения журнала, а для параметра «disable_existing_loggers» установлено значение «False», чтобы позволить другим средствам ведения журнала продолжать работу.
+
+# Раздел «handlers» определяет обработчик файла, который будет регистрировать ошибки в файле «debug.log». Раздел «loggers» настраивает регистратор «django» для использования обработчика «file» и регистрации ошибок.
+
+# Эта конфигурация подходит для производственной среды, где вы хотите фиксировать и регистрировать любые ошибки, возникающие в приложении Django.
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -155,9 +167,28 @@ LOGGING = {
     },
 }
 
+# Настраивает серверную часть кэша по умолчанию для использования кэша в памяти с тайм-аутом 30 минут.
+
+# CACHES — это словарь, который определяет серверные части кэша, которые будут использоваться Django. В этом случае серверная часть кэша «по умолчанию» настроена на использование внутренней части «LocMemCache», которая хранит данные кэша в памяти. Параметр `TIMEOUT` указывает, что срок действия кэшированных элементов истекает через 30 минут (1800 секунд).
+
+# Эта конфигурация подходит для разработки или небольших развертываний, где достаточно кэша в памяти. Для производственных сред рекомендуется использовать более надежный механизм кэширования, например Redis или Memcached.
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         'TIMEOUT': 1800,  # 30 минут
     }
 }
+
+try:
+    from prod_settings import *
+except ImportError:
+    # Database
+    # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
+
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+

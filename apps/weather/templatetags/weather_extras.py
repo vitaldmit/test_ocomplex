@@ -3,13 +3,16 @@ from django.utils.safestring import mark_safe
 
 register = template.Library()
 
+
 @register.filter
 def index(indexable, i):
     return indexable[i]
 
+
 @register.filter
 def range(value):
     return range(value)
+
 
 @register.filter
 def weather_icon(weathercode):

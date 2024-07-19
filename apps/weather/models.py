@@ -1,6 +1,7 @@
 # weather/models.py
 from django.db import models
 
+
 class SearchHistory(models.Model):
     session_key = models.CharField(max_length=40)
     city = models.CharField(max_length=100)

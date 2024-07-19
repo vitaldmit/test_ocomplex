@@ -1,25 +1,28 @@
 <!DOCTYPE html>
 <html lang="ru">
-
+{% load static %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Прогноз погоды</title>
-    {% load static %}
+
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-    <link rel="stylesheet" type="text/css" href="{% static 'weather/css/style.css' %}">
-    
-    
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
-    
+
     {% block content %}{% endblock %}
 
     <script>
+        // Инициализирует функцию автозаполнения для поля ввода города.
+        // Предложения автозаполнения извлекаются из URL - адреса city_autocomplete
+        // и отображаются по мере ввода пользователем.
+        // Предложения отображаются с задержкой 300 мс, чтобы избежать чрезмерных запросов.
         $(function () {
             var timer;
             $("#city-input").autocomplete({
@@ -42,9 +45,22 @@
                 minLength: 2
             });
         });
-    </script>
 
-    <script>
+
+        // Код ниже инициализирует и обновляет карту погоды на основе предоставленных данных о погоде.
+
+        // Код сначала проверяет, доступен ли`weather_data_json`, и если да, он анализирует данные JSON.
+        // и извлекает необходимую информацию(даты, максимальные и минимальные температуры и осадки).
+
+        // Затем он создает две функции диаграммы: createTemperatureChart() и createPrecipitationChart().
+        // Функция createTemperatureChart() создает линейную диаграмму для отображения максимальной и минимальной температуры.
+        // в то время как функция createPrecipitationChart() создает гистограмму для отображения осадков.
+
+        // Функция updateChart() отвечает за уничтожение предыдущего графика(если он есть) и создание нового.
+        // диаграмма на основе выбранного типа диаграммы(температура или осадки).
+
+        // Код также устанавливает прослушиватель событий для раскрывающегося списка «chartType», который запускает функцию «updateChart()».
+        // функция при изменении выбранного типа диаграммы.
         document.addEventListener('DOMContentLoaded', function () {
             {% if weather_data_json %}
             var weatherData = JSON.parse('{{ weather_data_json|safe }}');

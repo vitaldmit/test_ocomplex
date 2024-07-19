@@ -1,7 +1,8 @@
 from django.urls import path
-from . import views
+from .views import home, city_autocomplete, CitySearchCountView
 
 urlpatterns = [
-    path('', views.home, name='home'),
-    path('city-autocomplete/', views.city_autocomplete, name='city_autocomplete'),
+    path('', home, name='home'),
+    path('city-autocomplete/', city_autocomplete, name='city_autocomplete'),
+    path('api/city-search-count/', CitySearchCountView.as_view(), name='city_search_count'),
 ]
