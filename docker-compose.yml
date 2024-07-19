@@ -8,7 +8,11 @@ services:
     # Сборка образа из текущей директории
     build: .
     # Команда для запуска Django приложения через Gunicorn
-    command: gunicorn weather_project.wsgi:application --bind 0.0.0.0:8000
+    command: >
+      cp prod_settings.py weather_project/
+      python manage.py collectstatic --noinput
+      python manage.py migrate
+      gunicorn weather_project.wsgi:application --bind 0.0.0.0:8000
     # Монтирование локальной директории в контейнер
     volumes:
       - .:/app

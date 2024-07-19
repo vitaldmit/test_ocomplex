@@ -16,10 +16,4 @@ RUN pip install -r requirements.txt
 # Копируем все файлы проекта в контейнер
 COPY . .
 
-# Запускаем миграции
-RUN python manage.py migrate
-
-# Собираем статические файлы
-RUN python manage.py collectstatic --noinput
-
-RUN cp prod_settings.py weather_project/
+# RUN cp prod_settings.py weather_project/
