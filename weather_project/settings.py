@@ -148,24 +148,24 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Раздел «handlers» определяет обработчик файла, который будет регистрировать ошибки в файле «debug.log». Раздел «loggers» настраивает регистратор «django» для использования обработчика «file» и регистрации ошибок.
 
 # Эта конфигурация подходит для производственной среды, где вы хотите фиксировать и регистрировать любые ошибки, возникающие в приложении Django.
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'file': {
-            'level': 'ERROR',
-            'class': 'logging.FileHandler',
-            'filename': 'debug.log',
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['file'],
-            'level': 'ERROR',
-            'propagate': True,
-        },
-    },
-}
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'handlers': {
+#         'file': {
+#             'level': 'ERROR',
+#             'class': 'logging.FileHandler',
+#             'filename': 'debug.log',
+#         },
+#     },
+#     'loggers': {
+#         'django': {
+#             'handlers': ['file'],
+#             'level': 'ERROR',
+#             'propagate': True,
+#         },
+#     },
+# }
 
 # Настраивает серверную часть кэша по умолчанию для использования кэша в памяти с тайм-аутом 30 минут.
 
@@ -180,11 +180,11 @@ CACHES = {
 }
 
 try:
-    from prod_settings import *
+    from weather_project.prod_settings import *
 except ImportError:
     # Database
     # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
+    print('ImportError: prod_settings.py not found')
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
