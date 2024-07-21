@@ -13,20 +13,20 @@
 ## Установка и запуск.
 1. Так как `Docker` контейнеры еще не до конца реализованы, предлагаю создать и настроить виртуальное окружение 
 ```bash
-mkdir ~/dev; cd ~/dev
-python -m venv weather
-cd weather
+mkdir p ~/dev/tetsts/; cd ~/dev/tests/
+python -m venv test_ocomplex
+cd test_ocomplex
 . bin/activate
 mkdir src; cd src
 ```
 2. Необходимо склонировать проект `git clone https://github.com/vitaldmit/test_ocomplex.git .`
-3. Устанавливаем зависимости `pip install -r requirements.txt`
-4. Создаем файл `.env` на основе `.env.example` с помощью команды `cp .env.example .env`
-5. В файле `.env` необходимо указать `SECRET_KEY`
-6. Выполняем миграции `python manage.py makemigrations` и `python manage.py migrate`
-7. Запускаем сервер `python manage.py runserver`
-8. Для запуска тестов команда `python manage.py test`
-9. Для проверки API используется ссылка `/api/city-search-count/`
+3. Обновляем `PIP` командой `pip install --upgrade pip`
+4. Устанавливаем зависимости `pip install -r requirements.txt`
+5. Создаем файл `.env` на основе `.env.example` с помощью команды `cp .env.example .env`
+6. В файле `.env` необходимо указать `SECRET_KEY`
+7. Выполняем миграции `python manage.py makemigrations; python manage.py makemigrations weather` и `python manage.py migrate`
+8. Запускаем сервер `python manage.py runserver`
+9. Для запуска тестов команда `python manage.py test`
 
 
 #### Демонстрация сайта доступна по ссылке http://vitaldmit.fvds.ru:8000
