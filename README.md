@@ -32,4 +32,5 @@ mkdir src; cd src
 #### Демонстрация сайта доступна по ссылке http://vitaldmit.fvds.ru:8000
 #### Демонстрация API доступна по ссылке http://vitaldmit.fvds.ru:8000/api/city-search-count/
 
-![2024-07-19_16-01](https://github.com/user-attachments/assets/ad684463-c505-478a-b061-a5ea40d6e5d9)
+![Screenshot 2024-07-21 10 15 33](https://github.com/user-attachments/assets/5f80c511-5ba0-4296-894e-9ce7f0035fb9)
+
