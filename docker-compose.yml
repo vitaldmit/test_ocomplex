@@ -9,10 +9,10 @@ services:
     build: .
     # Команда для запуска Django приложения через Gunicorn
     command: >
-      cp prod_settings.py weather_project/
-      python manage.py collectstatic --noinput
-      python manage.py migrate
-      gunicorn weather_project.wsgi:application --bind 0.0.0.0:8000
+      sh -c "sed -i 's/DEBUG = True/DEBUG = False/g' /app/.env
+      && python manage.py collectstatic --noinput
+      && python manage.py migrate
+      && gunicorn weather_project.wsgi:application --bind 0.0.0.0:8000"
     # Монтирование локальной директории в контейнер
     volumes:
       - .:/app
