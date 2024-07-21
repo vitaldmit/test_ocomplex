@@ -26,14 +26,16 @@ mkdir src; cd src
 1. Запуск в контейнерах `Docker`:
 ```bash
 cp env.example .env
+sed -i 's/DEBUG = True/DEBUG = False/g' .env
 docker-compose up --build
 ```
 После проверки можно запустить `docker-compose down -v`
 
-2. Запуск в стандартном виртуальное окржение:
+2. Запуск в стандартном виртуальном окржении:
 - Обновляем `PIP` командой `pip install --upgrade pip`
 - Устанавливаем зависимости `pip install -r requirements.txt`
 - Создаем файл `.env` на основе `env.example` с помощью команды `cp env.example .env`
+- Меняем на `DEBUG = True` командой `sed -i 's/DEBUG = False/DEBUG = True/g' .env`
 - Выполняем миграции `python manage.py makemigrations; python manage.py makemigrations weather; python manage.py migrate`
 - Запускаем сервер `python manage.py runserver`
 - Для запуска тестов команда `python manage.py test`
@@ -42,7 +44,7 @@ docker-compose up --build
 #### Демонстрация сайта доступна по ссылке http://vitaldmit.fvds.ru
 #### Демонстрация API доступна по ссылке http://vitaldmit.fvds.ru/api/city-search-count/
 
-Проект по ссылке запущен на `Docker` контейнерах.
+☝️ Проект на сервере по ссылке запущен в `Docker` контейнерах `docker-compose up -d`
 
 ![Screenshot 2024-07-21 10 15 33](https://github.com/user-attachments/assets/5f80c511-5ba0-4296-894e-9ce7f0035fb9)
 
