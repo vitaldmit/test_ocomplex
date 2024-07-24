@@ -1,16 +1,17 @@
-# Тестовое задание от компании O-COMPLEX
+# Это web приложение где пользователь вводит название города и получает прогноз погоды и количество осадков на неделю.
 
-## Это web приложение где пользователь вводит название города и получает прогноз погоды в этом городе на ближайшее время.
 
-❗ Выполнены все пункты задания.
-
-Фреймворк использован `Django` и `django-rest-framework`.
+Фреймворк использован `Django` и `django-rest-framework`
 - АPI для погоды использован https://open-meteo.com/
 - API для автодополнения использован https://nominatim.openstreetmap.org
 - Для реализации API использован `django-rest-framework`
-- Также реализованы графики для удобного просмотра температуры и осадков.
+- Сохраняется история поиска для каждого пользователя, и есть API, показывающее сколько раз вводили какой город
+- Реализованы графики для удобного просмотра данных
+- Всё это помещено в докер контейнер
+- Написаны тесты
 
-## Установка и запуск.
+
+## Подготовка
 Сначала подгатавливаем директорию и виртуальное окружение для проекта:
 ```bash
 mkdir p ~/dev/tests/; cd ~/dev/tests/
@@ -19,11 +20,11 @@ cd test_ocomplex
 . bin/activate
 mkdir src; cd src
 ```
-Клонируем проект `git clone https://github.com/vitaldmit/test_ocomplex.git .`
+Клонируем проект `git clone https://github.com/vitaldmit/weather.git .`
 
-**Далее есть два способа запуска проекта:**
 
-1. Запуск в контейнерах `Docker`:
+## Далее есть два способа запуска проекта:
+❶ Запуск в контейнерах `Docker`:
 ```bash
 cp env.example .env
 sed -i 's/DEBUG = True/DEBUG = False/g' .env
@@ -31,20 +32,16 @@ docker-compose up --build
 ```
 После проверки можно запустить `docker-compose down -v`
 
-2. Запуск в стандартном виртуальном окржении:
-- Обновляем `PIP` командой `pip install --upgrade pip`
-- Устанавливаем зависимости `pip install -r requirements.txt`
-- Создаем файл `.env` на основе `env.example` с помощью команды `cp env.example .env`
-- Меняем на `DEBUG = True` командой `sed -i 's/DEBUG = False/DEBUG = True/g' .env`
-- Выполняем миграции `python manage.py makemigrations; python manage.py makemigrations weather; python manage.py migrate`
-- Запускаем сервер `python manage.py runserver`
-- Для запуска тестов команда `python manage.py test`
+❷ Запуск в стандартном виртуальном окржении:
+```bash
+pip install -U pip
+pip install -r requirements.txt
+cp env.example .env
+sed -i 's/DEBUG = False/DEBUG = True/g' .env
+python manage.py makemigrations; python manage.py makemigrations weather; python manage.py migrate
+python manage.py test
+python manage.py test
+```
 
-
-#### Демонстрация сайта доступна по ссылке http://vitaldmit.fvds.ru
-#### Демонстрация API доступна по ссылке http://vitaldmit.fvds.ru/api/city-search-count/
-
-☝️ Проект на сервере по ссылке запущен в `Docker` контейнерах `docker-compose up -d`
-
+## Cкриншот
 ![Screenshot 2024-07-21 10 15 33](https://github.com/user-attachments/assets/5f80c511-5ba0-4296-894e-9ce7f0035fb9)
-
